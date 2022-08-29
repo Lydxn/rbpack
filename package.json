@@ -1,19 +1,23 @@
 {
+  "homepage": "https://lydxn.github.io/rbpack",
   "dependencies": {
     "@codemirror/highlight": "^0.19.8",
     "@codemirror/lang-python": "^6.0.1",
     "@codemirror/legacy-modes": "^6.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "codemirror": "^6.0.1",
+    "codemirror": "^6.0.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^4.0.0",
     "rollup": "^2.78.1"
   },
   "name": "rbpack",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "start": "rollup -c"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d src -b site",
+    "build": "rollup -c"
   },
-  "keywords": [],
   "author": "",
   "license": "MIT",
   "description": ""
