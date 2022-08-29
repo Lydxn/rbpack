@@ -1,0 +1,95 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+}
+
+main {
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.container {
+    margin: 20px;
+}
+
+.cm-editor {
+    border: solid 2px #000;
+}
+
+.cm-focused {
+    outline: none !important;
+}
+
+.hl:hover {
+    border: none;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1.5px #333;
+}
+
+.logo {
+    margin-left: 20px;
+    margin-top: 20px;
+}
+
+@media (max-width: 850px) {
+    .logo, .tr-boilerplate {
+        display: none;
+    }
+}
+
+.tr-error {
+    border-color: #f00 !important;
+}
+
+.tr-input {
+    flex: 1 1;
+    overflow-x: hidden;
+}
+
+.tr-input .cm-editor {
+    font: 16px monospace;
+    margin: 0 5px;
+}
+
+.tr-input .cm-scroller {
+    overflow-x: hidden;
+}
+
+#char-count {
+    font: bold 16px monospace;
+    margin: 5px 0;
+}
+
+#source .cm-editor {
+    font-size: 18px;
+    height: 200px;
+}
+
+#tr-code {
+    align-items: center;
+    display: flex;
+    font: bold 20px monospace;
+    justify-content: space-between;
+}
+
+#tr-table {
+    border: 2px solid #000;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+    padding: 10px;
+}
+
+#tr-table > span {
+    font: 16px monospace;
+    padding: 3px 0;
+    text-align: center;
+    white-space: pre;
+}
+
+#output .cm-editor {
+    font-size: 18px;
+}
