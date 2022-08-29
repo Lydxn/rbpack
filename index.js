@@ -19,7 +19,8 @@ function escapeByte(byte) {
 
 function byteToColor(byte) {
     return byte <= 0x7F ? '#aaaaaa'
-         : byte <= 0xBF ? '#4e8bbf'
+         : byte <= 0xBF ? '#000000'
+         : byte <= 0xDF ? '#4e8bbf'
          : byte <= 0xEF ? '#ec9a29'
          :                '#6e44ff';
 }
