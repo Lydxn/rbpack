@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>rbpack</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="logo.png">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/ruby-head-wasm-wasi@0.2.0/dist/browser.umd.js"></script>
+        <script src="index.bundle.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <img class="logo" src="logo.png" width="75px" height="75px">
+        </header>
+        <main>
+            <div class="container" id="tr-code">
+                <span class="tr-boilerplate">eval''.b.tr</span>
+                <div class="tr-input" id="tr-from" placeholder="from_str"></div>
+                <span class="tr-boilerplate">,</span>
+                <div class="tr-input" id="tr-to" placeholder="to_str"></div>
+            </div>
+            <div class="container" id="source"></div>
+            <div class="container" id="tr-table"></div>
+            <div class="container" id="output-container">
+                <div id="output" placeholder="Output"></div>
+                <div id="char-count"></div>
+            </div>
+        </main>
+    </body>
+</html>
