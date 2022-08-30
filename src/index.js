@@ -63,7 +63,7 @@ const extensions = {
 
 const trFromEditor = new EditorView({
     state: EditorState.create({
-        doc: '',
+        doc: "''.b",
         extensions: [
             ...extensions.base,
             extensions.oneLine,
@@ -76,7 +76,7 @@ const trFromEditor = new EditorView({
 
 const trToEditor = new EditorView({
     state: EditorState.create({
-        doc: '',
+        doc: "''",
         extensions: [
             ...extensions.base,
             extensions.oneLine,
