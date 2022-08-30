@@ -17,12 +17,15 @@ function escapeByte(byte) {
     return String.fromCharCode(byte);
 }
 
+const BYTE_COLORS = [ '#aaaaaa', '#4e8bbf', '#ec9a29', '#6e44ff' ];
+
 function byteToColor(byte) {
-    return byte <= 0x7F ? '#aaaaaa'
-         : byte <= 0xBF ? '#000000'
-         : byte <= 0xDF ? '#4e8bbf'
-         : byte <= 0xEF ? '#ec9a29'
-         :                '#6e44ff';
+    return byte <= 0x7F ? BYTE_COLORS[0]
+         : byte <= 0xBF ? '#000000'  // [0x80-0xBF] bytes are somewhat special as
+                                     // no UTF-8 byte sequences can start with them.
+         : byte <= 0xDF ? BYTE_COLORS[1]
+         : byte <= 0xEF ? BYTE_COLORS[2]
+         :                BYTE_COLORS[3];
 }
 
 function updateTable(trans) {
@@ -60,7 +63,7 @@ const extensions = {
 
 const trFromEditor = new EditorView({
     state: EditorState.create({
-        doc: "''.b",
+        doc: '',
         extensions: [
             ...extensions.base,
             extensions.oneLine,
@@ -73,7 +76,7 @@ const trFromEditor = new EditorView({
 
 const trToEditor = new EditorView({
     state: EditorState.create({
-        doc: "''",
+        doc: '',
         extensions: [
             ...extensions.base,
             extensions.oneLine,
@@ -154,8 +157,9 @@ const outputEditor = new EditorView({
 
             // Highlight the source code by UTF-8 byte sequences.
             for (let charIndex = 0; charIndex < partData.length; charIndex++) {
-                const { bytes, index } = partData[charIndex];
-                const color = byteToColor(bytes[0]) + (charIndex % 2 === 0 ? '60' : '80');
+                const { bytes, index, size } = partData[charIndex];
+                console.log(bytes.length, size);
+                const color = BYTE_COLORS[size - 1] + (charIndex % 2 === 0 ? '60' : '80');
                 const decoration = Decoration.mark({
                     attributes: {
                         class: 'hl',

@@ -20,7 +20,7 @@ export class Packer {
 
                 const newCost = (startIndex !== 0 ? dp[startIndex - 1].cost : 0) + 1;
                 if (best === null || newCost < best.cost)
-                    best = { bytes: bytes, cost: newCost, prev: startIndex - 1 };
+                    best = { bytes: bytes, cost: newCost, prev: startIndex - 1, size: size };
             }
             dp[index] = best;
         }
@@ -31,7 +31,7 @@ export class Packer {
         // Perform a second pass to look for partial byte sequences. The search
         // is done in such a way that partials are prioritized at the end of the
         // source, as in most cases, this is what the user should expect.
-        const partDp = [ ...dp ];
+        let bestPart = null, bestIndex = -1;
         for (let index = 0; index < this.code.length; index++) {
             if (index !== 0 && dp[index - 1] === null)
                 continue;
@@ -46,10 +46,16 @@ export class Packer {
                     continue;
 
                 const newIndex = index + bytes.length - 1;
-                if (partDp[newIndex] === null || newCost <= partDp[newIndex].cost)
-                    partDp[newIndex] = { bytes: bytes, cost: newCost, prev: index - 1 };
+                if (bestPart === null || newIndex > bestIndex ||
+                    (newIndex == bestIndex && newCost <= bestPart.cost)) {
+                    bestPart = { bytes: bytes, cost: newCost, prev: index - 1, size: size };
+                    bestIndex = newIndex;
+                }
             }
         }
+
+        const partDp = [ ...dp ];
+        partDp[bestIndex] = bestPart;
 
         return { data: data, partData: this.traceDp(partDp), canPack: canPack };
     }
@@ -67,7 +73,11 @@ export class Packer {
         // Trace back `dp` to obtain the whole solution.
         const data = [];
         for (let curIndex = bestIndex; curIndex !== -1; curIndex = dp[curIndex].prev)
-            data.push({ bytes: dp[curIndex].bytes, index: dp[curIndex].prev + 1 });
+            data.push({
+                bytes: dp[curIndex].bytes,
+                index: dp[curIndex].prev + 1,
+                size: dp[curIndex].size
+            });
 
         return data.reverse();
     }

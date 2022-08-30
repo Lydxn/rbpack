@@ -16960,7 +16960,7 @@
 
                    const newCost = (startIndex !== 0 ? dp[startIndex - 1].cost : 0) + 1;
                    if (best === null || newCost < best.cost)
-                       best = { bytes: bytes, cost: newCost, prev: startIndex - 1 };
+                       best = { bytes: bytes, cost: newCost, prev: startIndex - 1, size: size };
                }
                dp[index] = best;
            }
@@ -16971,7 +16971,7 @@
            // Perform a second pass to look for partial byte sequences. The search
            // is done in such a way that partials are prioritized at the end of the
            // source, as in most cases, this is what the user should expect.
-           const partDp = [ ...dp ];
+           let bestPart = null, bestIndex = -1;
            for (let index = 0; index < this.code.length; index++) {
                if (index !== 0 && dp[index - 1] === null)
                    continue;
@@ -16986,10 +16986,16 @@
                        continue;
 
                    const newIndex = index + bytes.length - 1;
-                   if (partDp[newIndex] === null || newCost <= partDp[newIndex].cost)
-                       partDp[newIndex] = { bytes: bytes, cost: newCost, prev: index - 1 };
+                   if (bestPart === null || newIndex > bestIndex ||
+                       (newIndex == bestIndex && newCost <= bestPart.cost)) {
+                       bestPart = { bytes: bytes, cost: newCost, prev: index - 1, size: size };
+                       bestIndex = newIndex;
+                   }
                }
            }
+
+           const partDp = [ ...dp ];
+           partDp[bestIndex] = bestPart;
 
            return { data: data, partData: this.traceDp(partDp), canPack: canPack };
        }
@@ -17007,7 +17013,11 @@
            // Trace back `dp` to obtain the whole solution.
            const data = [];
            for (let curIndex = bestIndex; curIndex !== -1; curIndex = dp[curIndex].prev)
-               data.push({ bytes: dp[curIndex].bytes, index: dp[curIndex].prev + 1 });
+               data.push({
+                   bytes: dp[curIndex].bytes,
+                   index: dp[curIndex].prev + 1,
+                   size: dp[curIndex].size
+               });
 
            return data.reverse();
        }
@@ -17123,12 +17133,15 @@
        return String.fromCharCode(byte);
    }
 
+   const BYTE_COLORS = [ '#aaaaaa', '#4e8bbf', '#ec9a29', '#6e44ff' ];
+
    function byteToColor(byte) {
-       return byte <= 0x7F ? '#aaaaaa'
-            : byte <= 0xBF ? '#000000'
-            : byte <= 0xDF ? '#4e8bbf'
-            : byte <= 0xEF ? '#ec9a29'
-            :                '#6e44ff';
+       return byte <= 0x7F ? BYTE_COLORS[0]
+            : byte <= 0xBF ? '#000000'  // [0x80-0xBF] bytes are somewhat special as
+                                        // no UTF-8 byte sequences can start with them.
+            : byte <= 0xDF ? BYTE_COLORS[1]
+            : byte <= 0xEF ? BYTE_COLORS[2]
+            :                BYTE_COLORS[3];
    }
 
    function updateTable(trans) {
@@ -17166,7 +17179,7 @@
 
    const trFromEditor = new EditorView({
        state: EditorState.create({
-           doc: "''.b",
+           doc: '',
            extensions: [
                ...extensions.base,
                extensions.oneLine,
@@ -17179,7 +17192,7 @@
 
    const trToEditor = new EditorView({
        state: EditorState.create({
-           doc: "''",
+           doc: '',
            extensions: [
                ...extensions.base,
                extensions.oneLine,
@@ -17260,8 +17273,9 @@
 
                // Highlight the source code by UTF-8 byte sequences.
                for (let charIndex = 0; charIndex < partData.length; charIndex++) {
-                   const { bytes, index } = partData[charIndex];
-                   const color = byteToColor(bytes[0]) + (charIndex % 2 === 0 ? '60' : '80');
+                   const { bytes, index, size } = partData[charIndex];
+                   console.log(bytes.length, size);
+                   const color = BYTE_COLORS[size - 1] + (charIndex % 2 === 0 ? '60' : '80');
                    const decoration = Decoration.mark({
                        attributes: {
                            class: 'hl',
